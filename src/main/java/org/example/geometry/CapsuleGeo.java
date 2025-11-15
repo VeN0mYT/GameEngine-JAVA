@@ -5,6 +5,11 @@ import org.joml.Vector3f;
 
 public class CapsuleGeo extends IGeo {
 
+    public CapsuleGeo()
+    {
+        this(1,2,100,30);
+    }
+
     public CapsuleGeo(float radius, float height, int segments, int rings) {
         vertex = new java.util.ArrayList<>();
         color = new java.util.ArrayList<>();
@@ -41,6 +46,8 @@ public class CapsuleGeo extends IGeo {
                 color.add(new Vector3f(0.5f, 0.7f, 1.0f));
             }
         }
+
+
 
         int topVertexCount = vertex.size();
 

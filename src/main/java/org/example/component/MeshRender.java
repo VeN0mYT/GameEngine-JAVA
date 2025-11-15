@@ -54,6 +54,7 @@ public final class MeshRender extends Component{
     }
 
     public void Reset() {
+        mesh = engineObjectFix.GetComponent(Mesh.class);
         mesh.Reset();
 
         if(vao != null)
@@ -81,13 +82,12 @@ public final class MeshRender extends Component{
         vao.unbind();
     }
 
-    void Render(Transform transform, ECamera camera, Light light)
+    void Render()
     {
-        material.prepareForRender(light);
-        material.use();
-        material.getShader().getUniforms().setMat4("model", transform.getModelMatrix());
-        material.getShader().getUniforms().setMat4("view", camera.getViewMatrix());
-        material.getShader().getUniforms().setMat4("projection", camera.getProjectionMatrix());
+
+        material = engineObjectFix.GetComponent(Material.class);
+        material.bind();
+
 
         vao.bind();
         glDrawElements(GL_TRIANGLES, mesh.getIndicesList().size(), GL_UNSIGNED_INT, 0);
@@ -103,6 +103,7 @@ public final class MeshRender extends Component{
     {
 
         this.mesh = mesh;
+        engineObjectFix.AddComponent(mesh);
         Reset();
     }
 
@@ -145,12 +146,12 @@ public final class MeshRender extends Component{
 
     void update(ECamera camera)
     {
-        Render(engineObject.getTransform(),camera,engineObject.getLight());
+        Render();
     }
 
     public void update()
     {
-        Render(engineObjectFix.transform,engineObjectFix.getCamera(),engineObjectFix.getLight());
+        Render();
     }
 
     boolean addToPipeLine()

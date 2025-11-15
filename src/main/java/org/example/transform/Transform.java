@@ -1,12 +1,13 @@
 package org.example.transform;
 
+import org.example.component.Component;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Transform {
+public final class Transform extends Component {
     private Transform parent;
     private final List<Transform> children = new ArrayList<>();
 

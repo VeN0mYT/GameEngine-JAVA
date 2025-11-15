@@ -9,7 +9,7 @@ out vec4 FragColor;
 
 uniform sampler2D texture_diffuse1;
 uniform bool hasTexture = false;
-uniform bool hasLight = false;
+uniform bool hasLight = true;
 
 uniform vec3 lightPosition;
 uniform vec3 lightColor;

@@ -5,6 +5,11 @@ import org.joml.Vector3f;
 
 public class SphereGeo extends IGeo {
 
+    public SphereGeo()
+    {
+        this(1,30,30);
+    }
+
     public SphereGeo(float radius, int segments, int rings) {
         vertex = new java.util.ArrayList<>();
         color = new java.util.ArrayList<>();

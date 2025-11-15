@@ -2,6 +2,7 @@ package org.example.SkyBox;
 
 import org.example.camera.ECamera;
 import org.example.shader.Shader;
+import org.example.shader.ShaderGlobalOverride;
 import org.example.shader.ShaderType;
 import org.joml.Matrix4f;
 
@@ -32,6 +33,9 @@ public class SkyBox {
 
         cubemap = new CubemapTexture(faces);
         mesh = new SkyboxMesh();
+
+        ShaderGlobalOverride.getInstance().addGlobal("skybox", cubemap);
+
     }
 
     public void render() {

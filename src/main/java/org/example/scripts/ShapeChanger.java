@@ -23,7 +23,7 @@ public class ShapeChanger extends Behaviour {
         mesh[1] = new Mesh(new CubeGeo());
         mesh[2] = new Mesh(new CapsuleGeo(1,2,30,30));
 
-        meshRender = engineObject.getComponent(MeshRender.class,"MeshRender");
+        meshRender = engineObjectFix.GetComponent(MeshRender.class);
         meshRender.SetMesh(mesh[index]);
     }
 

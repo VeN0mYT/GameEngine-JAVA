@@ -16,7 +16,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Add these new uniforms 👇
-uniform float time = 0.1;       // passed from CPU each frame
+
+uniform float _Time = 0.1;       // passed from CPU each frame
 uniform float amplitude = 0.3;  // how strong the wave motion is
 uniform float frequency = 5.0;  // how many waves per unit distance
 
@@ -24,7 +25,7 @@ void main()
 {
     // ====== WAVE MOTION ======
     // Create a wavy displacement based on position + time
-    float wave = sin(aPos.x * frequency + time) * cos(aPos.y * frequency + time);
+    float wave = sin(aPos.x * frequency + _Time) * cos(aPos.y * frequency + _Time);
     vec3 displacedPos = aPos + aNormal * wave * amplitude;
 
     // ====== Standard transformations ======

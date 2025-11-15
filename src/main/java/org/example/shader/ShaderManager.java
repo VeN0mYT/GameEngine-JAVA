@@ -3,11 +3,20 @@ package org.example.shader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaderManager {
+public final class ShaderManager {
     private static ShaderManager instance;
     private Map<String, Shader> shaders;
     private ShaderManager() {
         shaders = new HashMap<>();
+        Shader shader = new Shader("Stander");
+        shader.readShader(ShaderType.VERTEX, "i:\\Java Projects\\OpenGl\\ShadersFiles\\StanderVertex");
+        shader.readShader(ShaderType.FRAGMENT, "i:\\Java Projects\\OpenGl\\ShadersFiles\\StanderFrag");
+        shader.compileShader();
+
+        Shader shader2 = new Shader("StanderPBR");
+        shader2.readShaderFile( "i:\\Java Projects\\OpenGl\\ShadersFiles\\StanderShader");
+        shaders.put("Stander", shader);
+        shaders.put("StanderPBR", shader2);
     }
 
     public static ShaderManager getInstance() {

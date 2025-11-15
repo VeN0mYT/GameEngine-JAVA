@@ -1,6 +1,6 @@
 package org.example.shader;
 
-public enum ShaderType {
+public  enum ShaderType {
     VERTEX,
     FRAGMENT;
 }

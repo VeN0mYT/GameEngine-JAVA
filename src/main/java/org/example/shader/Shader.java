@@ -3,14 +3,17 @@ package org.example.shader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
 
-public class Shader {
+public final class Shader {
     private String Name;
     private final int programID;
     private int vertexID;
     private int fragmentID;
+
+    private Map<String, ShaderParser.UniformData> uniformsParsed;
 
     private String vertexSource = "";
     private String fragmentSource = "";
@@ -21,6 +24,12 @@ public class Shader {
         this.Name = name;
         programID = glCreateProgram();
         uniform = new Uniform(this);
+    }
+
+    public Shader(String name,String path)
+    {
+        this(name);
+        readShaderFile(path);
     }
 
     public void readShaderFile(String filepath) {
@@ -56,6 +65,8 @@ public class Shader {
         createShaderVS();
         createShaderFG();
         compileShader();
+
+
     }
 
     // Load from file
@@ -121,6 +132,8 @@ public class Shader {
         // After linking, shaders can be deleted
         glDeleteShader(vertexID);
         glDeleteShader(fragmentID);
+
+        uniformsParsed = ShaderParser.parseUniforms(vertexSource +"\n"+ fragmentSource);
     }
 
     public void use() {
@@ -141,5 +154,13 @@ public class Shader {
 
     public String getName() {
         return Name;
+    }
+
+    public boolean hasUniform(String name) {
+        return uniform.hasUniform(name);
+    }
+
+    public Map<String, ShaderParser.UniformData> getUniformsParsed() {
+        return uniformsParsed;
     }
 }

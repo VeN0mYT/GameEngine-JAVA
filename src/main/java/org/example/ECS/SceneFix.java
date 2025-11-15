@@ -8,6 +8,8 @@ import org.example.ECS.manager.ComponentManager;
 import org.example.ECS.manager.EngineObjectManager;
 import org.example.ECS.systems.SystemBase;
 import org.example.light.Light;
+import org.example.shader.ShaderGlobalContext;
+import org.example.shader.ShaderGlobalOverride;
 import org.example.time.TimeFix;
 import org.joml.Vector3f;
 
@@ -28,6 +30,9 @@ public final class SceneFix {
 
     public SceneFix()
     {
+
+        ShaderGlobalContext.get().setCamera(camera);
+        ShaderGlobalContext.get().setMainLight(light);
         camera.getTransform().position.z = -5;
     }
 //    public EngineObjectFix createEngineObject()
@@ -43,6 +48,7 @@ public final class SceneFix {
             throw new IllegalArgumentException("EngineObject with name " + name + " already exists");
 
         EngineObjectMap.put(name, e);
+        e.AddComponent(e.transform);
         return e;
     }
 
@@ -63,6 +69,7 @@ public final class SceneFix {
 
     public void destroyEngineObject(EngineObjectFix id)
     {
+        EngineObjectMap.remove(id.getName());
         componentManager.remove(id);
         engineObjectManager.destroyEngineObject(id);
     }
@@ -96,6 +103,7 @@ public final class SceneFix {
     }
 
     public void render() {
+
         for (var s : systems)
             s.render();
 
@@ -121,6 +129,11 @@ public final class SceneFix {
     public EngineObjectFix findEngineObject(String id)  //need it for now until the editor and live compile be ready
     {
         return EngineObjectMap.get(id);
+    }
+
+    public Map<String,EngineObjectFix> getEngineObjectMap()
+    {
+        return EngineObjectMap;
     }
 
 

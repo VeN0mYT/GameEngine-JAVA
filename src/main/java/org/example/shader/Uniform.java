@@ -12,7 +12,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public class Uniform {
+public final class Uniform {
     private final Shader shader;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
 
@@ -33,6 +33,7 @@ public class Uniform {
         uniformLocations.put(name, location);
         return location;
     }
+
 
     public void setBoolean(String name, boolean value) {
         GL20.glUniform1i(getUniformLocation(name), value ? 1 : 0);
@@ -79,4 +80,17 @@ public class Uniform {
         }
         System.out.println();
     }
+
+    public boolean hasUniform(String name) {
+        if (uniformLocations.containsKey(name)) {
+
+            return uniformLocations.get(name) != -1;
+        }
+
+        int location = GL20.glGetUniformLocation(shader.getShaderID(), name);
+        uniformLocations.put(name, location);
+
+        return location != -1;
+    }
+
 }

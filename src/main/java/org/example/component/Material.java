@@ -1,12 +1,18 @@
 package org.example.component;
 
 
+import org.example.SkyBox.CubemapTexture;
 import org.example.camera.ECamera;
 import org.example.light.Light;
-import org.example.shader.Shader;
-import org.example.shader.ShaderType;
+import org.example.shader.*;
 import org.example.texture.Texture;
+import org.example.transform.Color;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,72 +21,128 @@ import static org.lwjgl.opengl.GL13.*;
 public final class Material extends Component {
     private Shader shader;
     private Map<String, Texture> textures = new HashMap<>();
-    private Map<String, Float> floats = new HashMap<>();
-    private Map<String, Vector3f> vectors = new HashMap<>();
-    private Map<String, Boolean> booleans = new HashMap<>();
+
+
+    private Map<String, Object> properties = new HashMap<>();
+
 
     public Material()
     {
-        shader = new Shader("Stander");
-        shader.readShader(ShaderType.VERTEX, "i:\\Java Projects\\OpenGl\\ShadersFiles\\StanderVertex");
-        shader.readShader(ShaderType.FRAGMENT, "i:\\Java Projects\\OpenGl\\ShadersFiles\\StanderFrag");
-        shader.compileShader();
+        shader = ShaderManager.getInstance().getShader("Stander");
+        CreateUniforms(shader);
+    }
+
+    public Material(String name,String path)
+    {
+        shader = new Shader(name,path);
+        ShaderManager.getInstance().addShader(shader);
+        CreateUniforms(shader);
+    }
+
+    public Material(String name)
+    {
+        shader = ShaderManager.getInstance().getShader(name);
+        CreateUniforms(shader);
     }
     public Material(Shader shader) {
         this.shader = shader;
+        CreateUniforms(shader);
+    }
+
+    private void CreateUniforms(Shader shader)
+    {
+        Map<String, ShaderParser.UniformData> uniformTypes  = shader.getUniformsParsed();
+
+        System.out.println("-----------------------");
+        for (Map.Entry<String, ShaderParser.UniformData> entry : uniformTypes.entrySet()) {
+            String name = entry.getKey();
+            ShaderParser.UniformData type = entry.getValue();
+
+            if(name.equals("model")||name.equals("view")||name.equals("projection")
+                    ||name.equals("lightPosition")||name.equals("lightColor")
+                    ||name.equals("lightIntensity")||name.equals("viewPos")
+                    ||name.equals("_Time"))
+                continue;
+
+            System.out.println(name+" "+type.type + " "+type.defaultValue);
+            switch (type.type) {
+                case "float" -> properties.put(name, type.defaultValue != null ? type.defaultValue : 0f);
+                case "vec2" -> properties.put(name, type.defaultValue != null ? type.defaultValue : new Vector2f());
+                case "vec3" -> properties.put(name, type.defaultValue != null ? type.defaultValue : new Vector3f());
+                case "vec4" -> properties.put(name, type.defaultValue != null ? type.defaultValue : new Vector4f());
+                case "mat4" -> properties.put(name, type.defaultValue != null ? type.defaultValue : new Matrix4f());
+                case "bool" -> properties.put(name,type.defaultValue != null ? type.defaultValue : false);
+                case "int" -> properties.put(name, type.defaultValue != null ? type.defaultValue : 0);
+                case "sampler2D" -> properties.put(name, null); // Texture
+                case "samplerCube" -> properties.put(name, null); // CubeMap
+                default -> System.err.println("Unknown uniform type: " + type);
+            }
+        }
     }
 
     public void setTexture(String name, Texture texture) {
         textures.put(name, texture);
     }
 
-    public void setFloat(String name, float value) {
-        floats.put(name, value);
+    public Object getUniform(String name) {
+        if(!properties.containsKey(name))
+            System.out.println("Uniform " + name + " not found");
+        return properties.get(name);
     }
 
-    public void setVector3(String name, Vector3f value) {
-        vectors.put(name, value);
+    public void setUniform(String name,Object value) {
+        if(!properties.containsKey(name))
+            System.out.println("Uniform " + name + " not found");
+
+        properties.put(name, value);
     }
 
-    public void setBoolean(String name, boolean value) {
-        booleans.put(name, value);
-    }
 
-    public void use() {
+
+    public void bind() {
         shader.use();
 
-        // Upload uniforms
-        for (Map.Entry<String, Float> entry : floats.entrySet()) {
-            shader.getUniforms().setFloat(entry.getKey(), entry.getValue());
-        }
+        ShaderGlobalOverride.getInstance().upload(shader);
 
-        for (Map.Entry<String, Vector3f> entry : vectors.entrySet()) {
-            shader.getUniforms().setVec3(entry.getKey(), entry.getValue());
-        }
+        Map<String, ShaderParser.UniformData> uniformTypes = shader.getUniformsParsed();
 
-        for (Map.Entry<String, Boolean> entry : booleans.entrySet()) {
-            shader.getUniforms().setInt(entry.getKey(), entry.getValue() ? 1 : 0);
-        }
+        if(shader.getUniformsParsed().containsKey("model"))
+            properties.put("model", transform.getModelMatrix());
 
-        // Bind textures
-        int unit = 0;
-        for (Map.Entry<String, Texture> entry : textures.entrySet()) {
-            glActiveTexture(GL_TEXTURE0 + unit);
-            entry.getValue().bind();
-            shader.getUniforms().setInt(entry.getKey(), unit);
-            unit++;
-        }
-    }
+        ShaderGlobalContext.get().uploadGlobals(shader);
 
-    public void prepareForRender(Light light) {
-        setBoolean("hasTexture", !textures.isEmpty());
-        setBoolean("hasLight", light != null);
 
-        if (light != null) {
-            setVector3("lightPosition", light.getPosition());
-            setVector3("lightColor", light.getColor());
-            setFloat("lightIntensity", light.getIntensity());
-            setVector3("ambientColor", new Vector3f(0.15f, 0.15f, 0.2f));
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if (value == null) continue;
+
+
+            switch (uniformTypes.get(name).type) {
+                case "float" -> shader.getUniforms().setFloat(name, (Float) value);
+                case "bool" -> shader.getUniforms().setInt(name, (Boolean) value ? 1 : 0);
+                case "int" -> shader.getUniforms().setInt(name, (Integer) value);
+                case "vec2" -> shader.getUniforms().setVec2(name, (Vector2f) value);
+                case "vec3" -> shader.getUniforms().setVec3(name, (Vector3f) value);
+                case "vec4" -> shader.getUniforms().setVec4(name, (Vector4f) value);
+                case "mat4" -> shader.getUniforms().setMat4(name, (Matrix4f) value);
+                case "sampler2D" -> {   //texture need more work
+                    Texture tex = (Texture) value;
+                    if(tex != null) {
+                        int slot = 0; // You can integrate a TextureManager for dynamic slots
+                        tex.bind(slot);
+                        shader.getUniforms().setInt(name, slot);
+                    }
+                }
+                case "samplerCube" -> {
+                    CubemapTexture cubeMap = (CubemapTexture) value;
+                    if(cubeMap != null) {
+                        int slot = 0;
+                        cubeMap.use(slot);
+                        shader.getUniforms().setInt(name, slot);
+                    }
+                }
+            }
         }
     }
 

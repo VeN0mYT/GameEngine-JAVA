@@ -1,5 +1,9 @@
 package org.example;
 
+import org.example.ECS.EngineObjectFix;
+import org.example.ECS.SceneFix;
+import org.example.ECS.systems.BehaviourSystem;
+import org.example.ECS.systems.RenderSystem;
 import org.example.camera.ECamera;
 import org.example.camera.FPSCamera;
 import org.example.component.MeshRender;
@@ -34,16 +38,15 @@ import static org.lwjgl.opengl.GL11.glEnable;
 
 public class ObjectTest {
 
-    public static FPSCamera camera;
-    public static ECamera cam;
-    public  static Scene sc;
+
+    public  static SceneFix sc;
     public  static ImGuiWindow win;
 
     public static Light lig;
 
     public static boolean isLight = false;
 
-    public static EngineObject t = null;
+    public static EngineObjectFix t = null;
     public static void main(String[] args) {
         Render render = Render.getInstance(800, 600, "objectTest", SyncMode.VSYNC_ON);
 
@@ -72,93 +75,58 @@ public class ObjectTest {
         win.addElement(new ImGuiInputFloat("Intensity",1));
 
 
-        cam = new ECamera(1f);
-        cam.getTransform().position = new Vector3f(0,3,8);
-        cam.SetFov(90);
-
-//        camera = new FPSCamera(new Vector3f(0, 0, 3), 5f);
-//        camera.setPerspective(90f,1f,0.1f,100f);
-//        camera.enable(true);
-
-        sc = new Scene(cam);
-
-        IGeo cap = new CapsuleGeo(1,2,100,30);
-        IGeo cub = new CubeGeo();
-        IGeo sphere = new SphereGeo(1,30,30);
-
-        Material mat = new Material();
-        Material matGreen = new Material();
-        Material matRed = new Material();
-
-        mat.setVector3("color",new Vector3f(1,0,0));
-        matGreen.setVector3("color",new Vector3f(0,1,0));
-        matRed.setVector3("color",new Vector3f(1,0,0));
-
-        Mesh mesh = new Mesh(cap);
-        Mesh sph = new Mesh(sphere);
-        Mesh cubs = new Mesh(cub);
-
-        Mesh LightMesh = new Mesh(new SphereGeo(1,30,30));
-        Material LightMat = new Material();
-        LightMat.setVector3("color",new Vector3f(1,1,1));
 
 
-
-        EngineObject en = new EngineObject("Capsul");
-        en.addComponent(mesh);
-        en.addComponent(mat);
-        en.addComponent(new MeshRender());
-        en.addComponent(new MoveMent());
-        en.addComponent(new ElFathy());
-
-        EngineObject cp = new EngineObject("Shpere");
-        cp.addComponent(sph);
-        cp.addComponent(matGreen);
-        cp.addComponent(new MeshRender());
-//        cp.addComponent(script.class);
-
-        EngineObject ca = new EngineObject("Cube");
-        ca.addComponent(cubs);
-        ca.addComponent(matRed);
-        ca.addComponent(new MeshRender());
-        ca.addComponent(new script());
-
-        EngineObject el = new EngineObject("ElFathy");
-        el.addComponent(new ElFathy());
-        el.addComponent(new MeshRender());
-        el.addComponent(new Mesh(new SphereGeo(1,30,30)));
-        el.addComponent(new Material());
-        el.addComponent(new ShapeChanger());
+        sc = new SceneFix();
+        sc.addSystem(new BehaviourSystem());
+        sc.addSystem(new RenderSystem());
 
 
-        EngineObject light = new EngineObject("Light");
-        light.addComponent(LightMesh);
-        light.addComponent(LightMat);
-        light.addComponent(new MeshRender());
+        EngineObjectFix en = sc.createEngineObject("Capsul");
+        en.AddComponent(new Mesh(new CapsuleGeo(1,2,100,30)));
+        en.AddComponent(new Material("Stander"));
+        en.AddComponent(new MeshRender());
+        en.AddComponent(new MoveMent());
+        en.AddComponent(new ElFathy());
+        en.transform.position = new Vector3f(0,0,0);
+        en.transform.rotation = new Vector3f(0,0,0);
 
-//        light.getMaterial().setBoolean("hasLight",false);
-        light.getComponent(Material.class,"Material").setBoolean("hasLight",false);
-        light.getTransform().position = new Vector3f(0,0,0);
-        light.getTransform().scale = new Vector3f(0.2f,0.2f,0.2f);
+        EngineObjectFix cp = sc.createEngineObject("Shpere");
+        cp.AddComponent(new Mesh(new SphereGeo(1,30,100)));
+        cp.AddComponent(new Material("Stander"));
+        cp.AddComponent(new MeshRender());
+        cp.transform.position = new Vector3f(2,0,0);
 
-        en.getTransform().position = new Vector3f(0,0,0);
-        en.getTransform().rotation = new Vector3f(0,0,0);
-        cp.getTransform().position = new Vector3f(2,0,0);
-        ca.getTransform().position = new Vector3f(-2,2,0);
+        EngineObjectFix ca = sc.createEngineObject("Cube");
+        ca.AddComponent(new Mesh(new CubeGeo()));
+        ca.AddComponent(new Material("Stander"));
+        ca.AddComponent(new MeshRender());
+        ca.AddComponent(new script());
+        ca.transform.position = new Vector3f(-2,2,0);
 
-//        cam.getTransform().setParent(en.getTransform());
-        cp.getTransform().setParent(en.getTransform());
-        ca.getTransform().setParent(cp.getTransform());
+        EngineObjectFix el = sc.createEngineObject("ElFathy");
+        el.AddComponent(new ElFathy());
+        el.AddComponent(new Material());
+        el.AddComponent(new Mesh(new SphereGeo(1,30,30)));
+        el.AddComponent(new MeshRender());
+        el.AddComponent(new ShapeChanger());
 
-        light.getTransform().setParent(sc.GetLight().getTransform());
+        EngineObjectFix light = sc.createEngineObject("Light");
+        light.AddComponent(new Mesh(new SphereGeo(1,30,30)));
+        light.AddComponent(new Material("Stander"));
+        light.AddComponent(new MeshRender());
+        light.transform.position = new Vector3f(0,0,0);
+        light.transform.scale = new Vector3f(0.2f,0.2f,0.2f);
 
-        sc.addObject(en);
-        sc.addObject(cp);
-        sc.addObject(ca);
-        sc.addObject(light);
-        sc.addObject(el);
 
-        lig = sc.GetLight();
+
+
+        cp.transform.setParent(en.transform);
+        ca.transform.setParent(cp.transform);
+
+        light.transform.setParent(sc.getLight().getTransform());
+
+        lig = sc.getLight();
 
         sc.start();
         glEnable(GL_DEPTH_TEST);
@@ -182,47 +150,6 @@ public class ObjectTest {
         }
 
 
-        Vector3f dir = new Vector3f();
-        if(Input.isKeyDown(GLFW.GLFW_KEY_W)) {
-            dir.add(cam.getTransform().forward().mul(0.2f));
-        }
-        if(Input.isKeyDown(GLFW.GLFW_KEY_S)) {
-            dir.add(cam.getTransform().forward().mul(-0.2f));
-        }
-        if(Input.isKeyDown(GLFW.GLFW_KEY_A)) {
-            dir.add(cam.getTransform().right().mul(-0.2f));
-        }
-        if(Input.isKeyDown(GLFW.GLFW_KEY_D)) {
-            dir.add(cam.getTransform().right().mul(0.2f));
-        }
-        if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
-            dir.add(cam.getTransform().up().mul(0.2f));
-        }
-        if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            dir.add(cam.getTransform().up().mul(-0.2f));      //need a better desiegn
-        }
-
-
-
-        float sensitivity = 0.1f;
-
-        cam.getTransform().position.add(dir);
-        cam.getTransform().rotate(new Vector3f((float)Mouse.getDeltaY() * sensitivity,(float)Mouse.getDeltaX() * sensitivity,0));
-       // tem.getTransform().rotate(new Vector3f(0,(float)Mouse.getDeltaX() * sensitivity,0));
-
-
-//        if(tem.getTransform().equals(sc.GetObject("Cube").getTransform()))
-//        {
-//            tem.setMaterial(sc.GetObject("Cube").getMaterial());
-//        }
-//
-//        if(tem.getTransform().equals(sc.GetObject("Shpere").getTransform()))
-//        {
-//            tem.setMaterial(sc.GetObject("Shpere").getMaterial());
-//        }
-
-
-
         ImGuiListBox l = (ImGuiListBox)win.getElement("List");
         ImGuiColorPicker3 cp = (ImGuiColorPicker3)win.getElement("Color");
         ImGuiCheckbox cb = (ImGuiCheckbox)win.getElement("ORColor");
@@ -232,24 +159,24 @@ public class ObjectTest {
         ImGuiInputFloat intensity = (ImGuiInputFloat)win.getElement("Intensity");
 
         if(!l.getSelectedItem().equals("Light")) {
-            if (t != sc.GetObject(l.getSelectedItem())) {
-                t = sc.GetObject(l.getSelectedItem());
+            if (t != sc.findEngineObject(l.getSelectedItem())) {
+                t = sc.findEngineObject(l.getSelectedItem());
 
 
-                x.setValue(t.getTransform().position);
-                y.setValue(t.getTransform().rotation);
-                z.setValue(t.getTransform().scale);
+                x.setValue(t.transform.position);
+                y.setValue(t.transform.rotation);
+                z.setValue(t.transform.scale);
 
             }
 
 
 
-            t.getComponent(Material.class,"Material").setVector3("color", cp.getColor());
-            t.getComponent(Material.class,"Material").setBoolean("hasColor", cb.isChecked());
+            t.GetComponent(Material.class).setUniform("color", cp.getColor());
+            t.GetComponent(Material.class).setUniform("hasColor", cb.isChecked());
 
-            t.getTransform().position = x.getVectorValue();
-            t.getTransform().rotation = y.getVectorValue();
-            t.getTransform().scale = z.getVectorValue();
+            t.transform.position = x.getVectorValue();
+            t.transform.rotation = y.getVectorValue();
+            t.transform.scale = z.getVectorValue();
             isLight = false;
         }
         else
