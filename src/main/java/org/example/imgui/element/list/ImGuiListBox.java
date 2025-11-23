@@ -1,7 +1,7 @@
-package org.example.imgui.list;
+package org.example.imgui.element.list;
 
 import imgui.type.ImInt;
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 
 import java.util.ArrayList;
 import java.util.List;

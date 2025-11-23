@@ -1,7 +1,6 @@
-package org.example.imgui.input;
+package org.example.imgui.element.input;
 
-import imgui.type.ImFloat;
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 import org.joml.Vector3f;
 
 public class ImGuiInputFloat3  implements ImGuiElement{

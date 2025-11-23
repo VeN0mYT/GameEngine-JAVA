@@ -1,15 +1,15 @@
-package org.example.imgui;
+package org.example.imgui.element;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
+import org.example.imgui.enginewindow.EngineWindow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class ImGuiWindow {
+public class ImGuiWindow implements EngineWindow {
     private String title;
     private float x, y, width, height;
     private ImBoolean open = new ImBoolean(true);
@@ -18,7 +18,7 @@ public class ImGuiWindow {
     private boolean resizable = true;
     private boolean collapsible = true;
 
-    private final HashMap<String,ImGuiElement> elementsByName = new HashMap<>();
+    private final HashMap<String, ImGuiElement> elementsByName = new HashMap<>();
     private final List<ImGuiElement> elements = new ArrayList<>();
 
 

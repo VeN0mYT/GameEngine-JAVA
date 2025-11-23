@@ -1,8 +1,8 @@
-package org.example.imgui.input;
+package org.example.imgui.element.input;
 
 import imgui.ImGui;
 import imgui.type.ImInt;
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 
 import java.util.ArrayList;
 import java.util.List;

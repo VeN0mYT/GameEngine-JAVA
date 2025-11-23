@@ -1,6 +1,6 @@
-package org.example.imgui.color;
+package org.example.imgui.element.color;
 
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 import org.example.transform.Color;
 import org.joml.Vector4f;
 

@@ -1,5 +1,9 @@
 package org.example;
 
+import imgui.ImGui;
+import imgui.ImVec2;
+import imgui.flag.ImGuiDockNodeFlags;
+import imgui.flag.ImGuiWindowFlags;
 import org.example.ECS.EngineObjectFix;
 import org.example.ECS.SceneFix;
 import org.example.ECS.systems.BehaviourSystem;
@@ -10,33 +14,33 @@ import org.example.component.MeshRender;
 import org.example.geometry.CapsuleGeo;
 import org.example.geometry.CubeGeo;
 import org.example.geometry.SphereGeo;
-import org.example.imgui.SceneHierarchyPanel;
+import org.example.imgui.enginewindow.SceneHierarchyPanel;
 import org.example.input.Input;
 import org.example.input.Mouse;
 import org.example.render.Render;
 import org.example.render.SyncMode;
 import org.example.scripts.newscriptsystem.ECStest;
 import org.example.scripts.newscriptsystem.LightFinder;
-import org.example.scripts.newscriptsystem.MoveCube;
 import org.example.scripts.newscriptsystem.testNewMaterial;
 import org.example.scripts.script;
-import org.example.shader.Shader;
-import org.example.shader.ShaderType;
-import org.example.texture.Texture;
-import org.example.time.Time;
-import org.example.time.TimeFix;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class TestECS {
     public static SceneFix sc;
     public static Material mat;
 
+    private static int framebuffer;
+    private static int textureColor;
+    private static int depthBuffer;
+
     public static SceneHierarchyPanel sceneHierarchyPanel;
     public static void main(String[] args) {
-        Render render = Render.getInstance(800, 600, "objectTest", SyncMode.VSYNC_ON);
+        //800 600
+        Render render = Render.getInstance(1920, 1080, "objectTest", SyncMode.VSYNC_ON);
 
         render.setInit(TestECS::init);
         render.setOnRender(TestECS::onRender);
@@ -111,6 +115,30 @@ public class TestECS {
 
         sc.start();
         glEnable(GL_DEPTH_TEST);
+
+        int width = 1920, height = 1080;
+
+        framebuffer = glGenFramebuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        // Color texture
+        textureColor = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureColor);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColor, 0);
+
+        // Depth renderbuffer
+        depthBuffer = glGenRenderbuffers();
+        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            System.err.println("Framebuffer not complete!");
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     static void onRender()
@@ -125,8 +153,40 @@ public class TestECS {
 
 
         sc.update();
-        sc.render();
+
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowSize(1920, 1080);
+        ImGui.begin("DockSpace Demo",
+                ImGuiWindowFlags.NoTitleBar |
+                        ImGuiWindowFlags.NoResize |
+                        ImGuiWindowFlags.NoMove |
+                        ImGuiWindowFlags.NoCollapse |
+                        ImGuiWindowFlags.MenuBar |
+                        ImGuiWindowFlags.NoBringToFrontOnFocus);
+        int dockspaceID = ImGui.getID("MainDockSpace");
+        ImGui.dockSpace(dockspaceID, 0, 0,  ImGuiDockNodeFlags.PassthruCentralNode);
+
+        // Scene hierarchy
         sceneHierarchyPanel.render();
+
+        ImGui.end();
+
+        // ---------- Render scene to framebuffer ----------
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glViewport(0, 0, 1920, 1080);
+        glClearColor(0.1f, 0.1f, 0.1f, 1f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        sc.render();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // ---------- Show framebuffer in ImGui ----------
+        ImGui.begin("OpenGL Preview");
+
+        ImGui.image(textureColor, ImGui.getWindowWidth(), ImGui.getWindowHeight(), 0, 1, 1, 0);
+
+        ImGui.end();
     }
 
     static void onEnd()

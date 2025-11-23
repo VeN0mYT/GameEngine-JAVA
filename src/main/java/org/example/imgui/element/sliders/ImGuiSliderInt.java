@@ -1,6 +1,6 @@
-package org.example.imgui.sliders;
+package org.example.imgui.element.sliders;
 
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 
 public class ImGuiSliderInt implements ImGuiElement {
     private final String label;

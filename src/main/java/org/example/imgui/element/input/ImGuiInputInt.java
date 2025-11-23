@@ -1,6 +1,6 @@
-package org.example.imgui.input;
+package org.example.imgui.element.input;
 
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 import imgui.type.ImInt;
 
 public class ImGuiInputInt implements ImGuiElement{

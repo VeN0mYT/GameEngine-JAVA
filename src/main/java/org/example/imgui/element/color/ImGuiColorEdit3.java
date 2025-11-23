@@ -1,6 +1,6 @@
-package org.example.imgui.color;
+package org.example.imgui.element.color;
 
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 
 public class ImGuiColorEdit3 implements ImGuiElement {
     private final String label;
