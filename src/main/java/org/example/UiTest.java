@@ -1,22 +1,20 @@
 package org.example;
 
-import org.example.imgui.color.ImGuiColorEdit3;
-import org.example.imgui.color.ImGuiColorPicker3;
-import org.example.imgui.input.ImGuiButton;
-import org.example.imgui.input.ImGuiCheckbox;
-import org.example.imgui.list.ImGuiListBox;
+import org.example.imgui.element.ImGuiElementCreator;
+import org.example.imgui.element.ImGuiWindow;
+import org.example.imgui.element.input.ImGuiButton;
+import org.example.imgui.element.input.ImGuiCheckbox;
+import org.example.imgui.element.list.ImGuiListBox;
 import org.example.imgui.reflectfield.ReflectFields;
-import org.example.imgui.sliders.DragInt;
-import org.example.imgui.sliders.ImGuiSliderFloat;
-import org.example.imgui.*;
-import org.example.imgui.input.ImGuiRadioButton;
+import org.example.imgui.element.sliders.ImGuiSliderFloat;
+import org.example.imgui.element.input.ImGuiRadioButton;
 import org.example.render.Render;
 import org.example.render.*;
 import org.example.scripts.script;
 
 public class UiTest {
 
-    public static  ImGuiWindow UiWindow;
+    public static ImGuiWindow UiWindow;
 
     public static void main(String[] args) {
         Render render = Render.getInstance(800, 600, "UiTest", SyncMode.VSYNC_ON);

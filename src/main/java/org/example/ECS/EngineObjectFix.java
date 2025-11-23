@@ -60,15 +60,34 @@ public final class EngineObjectFix {
         scene.getComponentManager().remove(this, type);
     }
 
-    public void setParent(EngineObjectFix parent)
-    {
-        transform.setParent(parent.transform);
-    }
+//    public void setParent(EngineObjectFix parent)
+//    {
+//        transform.setParent(parent.transform);
+//    }
 
     public void setParent(Transform parent)
     {
         transform.setParent(parent);
     }
+
+    public void setParent(EngineObjectFix parent) {
+
+        Transform t = this.transform;
+
+        // If was root → remove from root list
+        if (t.getParent() == null)
+            scene.rootObjects.remove(this);
+
+        if (parent == null) {
+            // Becomes root
+            t.setParent(null);
+            scene.rootObjects.add(this);
+        } else {
+            t.setParent(parent.transform);
+        }
+    }
+
+
 
 //    public void setActive(boolean active)
 //    {

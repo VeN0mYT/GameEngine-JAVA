@@ -1,4 +1,4 @@
-package org.example.imgui;
+package org.example.imgui.element;
 
 public interface ImGuiElement {
     void render();

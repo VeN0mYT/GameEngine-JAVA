@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
@@ -13,6 +14,8 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lwjgl.version>3.3.4</lwjgl.version>
+        <javafx.version>21.0.2</javafx.version>
+        <imgui.version>1.86.11</imgui.version>
     </properties>
 
     <!-- Dependency management for LWJGL BOM -->
@@ -29,19 +32,15 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Core LWJGL -->
+        <!-- LWJGL Core -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
         </dependency>
-
-        <!-- OpenGL -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-opengl</artifactId>
         </dependency>
-
-        <!-- GLFW -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-glfw</artifactId>
@@ -64,12 +63,7 @@
             <classifier>natives-windows</classifier>
         </dependency>
 
-        <dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml</artifactId>
-            <version>1.10.5</version>
-        </dependency>
-
+        <!-- LWJGL utilities -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-stb</artifactId>
@@ -80,58 +74,92 @@
             <classifier>natives-windows</classifier>
         </dependency>
 
+        <!-- JOML math library -->
+        <dependency>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>1.10.5</version>
+        </dependency>
+
+        <!-- KryoNet networking -->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryonet</artifactId>
             <version>2.22.0-RC1</version>
         </dependency>
-
-        <!-- Kryo serialization (used by KryoNet) -->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>5.5.0</version>
         </dependency>
-
-        <!-- Object graph serialization dependency for Kryo -->
         <dependency>
             <groupId>de.javakaffee</groupId>
             <artifactId>kryo-serializers</artifactId>
             <version>0.45</version>
         </dependency>
 
+        <!-- ImGui -->
         <dependency>
             <groupId>io.github.spair</groupId>
             <artifactId>imgui-java-binding</artifactId>
-            <version>1.86.11</version>
+            <version>${imgui.version}</version>
         </dependency>
-
-        <!-- LWJGL3 backend (required for window/input integration) -->
         <dependency>
             <groupId>io.github.spair</groupId>
             <artifactId>imgui-java-lwjgl3</artifactId>
-            <version>1.86.11</version>
+            <version>${imgui.version}</version>
         </dependency>
-
-        <!-- Platform-specific native library -->
-        <!-- Choose ONE of these depending on your OS -->
         <dependency>
             <groupId>io.github.spair</groupId>
             <artifactId>imgui-java-natives-windows</artifactId>
-            <version>1.86.11</version>
+            <version>${imgui.version}</version>
+        </dependency>
+
+        <!-- JavaFX 21 (Windows) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
         </dependency>
 
     </dependencies>
 
-
-
     <build>
         <plugins>
-            <!-- Run with: mvn exec:java -Dexec.mainClass="org.example.Main" -->
+            <!-- Exec plugin for LWJGL/ImGui -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
+                <configuration>
+                    <mainClass>org.example.Main</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- JavaFX Maven plugin -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
                 <configuration>
                     <mainClass>org.example.Main</mainClass>
                 </configuration>

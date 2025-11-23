@@ -2,6 +2,7 @@ package org.example.transform;
 
 import org.example.component.Component;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -30,22 +31,66 @@ public final class Transform extends Component {
     // ---------------------
     // 🔗 Parent/Children System
     // ---------------------
-    public void setParent(Transform parent) {
-        if(parent == this)
+//    public void setParent(Transform parent) {
+//        if(parent == this)
+//            throw new RuntimeException("Cannot set parent to itself");
+//
+//        if (this.parent != null)
+//            this.parent.children.remove(this);
+//
+//        this.parent = parent;
+//
+//        if (parent != null && !parent.children.contains(this))
+//            parent.children.add(this);
+//    }
+
+    public void setParent(Transform newParent) {
+        if (newParent == this)
             throw new RuntimeException("Cannot set parent to itself");
 
-        if (this.parent != null)
-            this.parent.children.remove(this);
+        // 1️⃣ Save world matrix before changing parent
+        Matrix4f worldBefore = getModelMatrix();
 
-        this.parent = parent;
+        // 2️⃣ Remove from old parent
+        if (parent != null)
+            parent.children.remove(this);
 
-        if (parent != null && !parent.children.contains(this))
-            parent.children.add(this);
+        parent = newParent;
+
+        // 3️⃣ Add to new parent
+        if (newParent != null && !newParent.children.contains(this))
+            newParent.children.add(this);
+
+        // 4️⃣ Recompute local transform so world stays the SAME
+        Matrix4f parentWorld = (parent == null)
+                ? new Matrix4f().identity()
+                : parent.getModelMatrix();
+
+        Matrix4f invParent = parentWorld.invert(new Matrix4f());
+        Matrix4f newLocal = invParent.mul(worldBefore);
+
+        // Extract TRS back into local position/rotation/scale
+        newLocal.getTranslation(position);
+        newLocal.getScale(scale);
+
+        rotation = decomposeRotation(newLocal);  // helper function below
     }
 
-    public Transform getParent() {
-        return parent;
+    private Vector3f decomposeRotation(Matrix4f m) {
+        Vector3f euler = new Vector3f();
+
+        m.getNormalizedRotation(new Quaternionf())
+                .getEulerAnglesXYZ(euler);
+
+        euler.set(
+                (float)Math.toDegrees(euler.x),
+                (float)Math.toDegrees(euler.y),
+                (float)Math.toDegrees(euler.z)
+        );
+
+        return euler;
     }
+
 
     public List<Transform> getChildren() {
         return children;
@@ -125,6 +170,11 @@ public final class Transform extends Component {
         scale.add(delta);
     }
 
+    public Transform getParent()
+    {
+        return parent;
+    }
+
     // ---------------------
     // 🔁 Recursive Update
     // ---------------------
@@ -141,4 +191,7 @@ public final class Transform extends Component {
         Transform other = (Transform) obj;
         return position.equals(other.position) && rotation.equals(other.rotation) && scale.equals(other.scale);
     }
+
+
+
 }

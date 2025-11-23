@@ -1,5 +1,6 @@
 package org.example.render;
 
+import imgui.flag.ImGuiConfigFlags;
 import org.example.imgui.theme.ImGuiTheme;
 import org.example.input.Input;
 import org.example.input.Mouse;
@@ -71,12 +72,15 @@ public final class Render {
          GL.createCapabilities();
 
          ImGui.createContext();
-         ImGuiIO io = ImGui.getIO();
 
          imGuiGlfw.init(window, true);
          imGuiGl3.init("#version 330 core");
+         ImGui.getIO().setConfigFlags(ImGui.getIO().getConfigFlags() | ImGuiConfigFlags.DockingEnable);
+         ImGuiIO io = ImGui.getIO();
+//         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
+//         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 
-         ImGuiTheme.applyDarkTheme();
+         ImGuiTheme.apply();
 
 
 
@@ -133,10 +137,10 @@ public final class Render {
          onEnd.run();
          destroy();
          imGuiGl3.dispose();
-         imGuiGlfw.dispose();
+//         imGuiGlfw.dispose();
          ImGui.destroyContext();
-         GLFW.glfwDestroyWindow(window);
-         org.lwjgl.glfw.GLFW.glfwTerminate();
+//         GLFW.glfwDestroyWindow(window);
+//         org.lwjgl.glfw.GLFW.glfwTerminate();
          if (cursorPosCallback != null) {
              cursorPosCallback.close();
          }

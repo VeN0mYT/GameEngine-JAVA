@@ -1,7 +1,7 @@
-package org.example.imgui.input;
+package org.example.imgui.element.input;
 
 import imgui.type.ImFloat;
-import org.example.imgui.ImGuiElement;
+import org.example.imgui.element.ImGuiElement;
 
 public class ImGuiInputFloat implements ImGuiElement {
     private final String label;

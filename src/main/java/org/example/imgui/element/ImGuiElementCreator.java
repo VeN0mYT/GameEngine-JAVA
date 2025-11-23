@@ -1,16 +1,13 @@
-package org.example.imgui;
+package org.example.imgui.element;
 
-import org.example.imgui.input.*;
-import org.joml.Vector3f;
-
-import java.lang.reflect.Field;
+import org.example.imgui.element.input.*;
 
 public class ImGuiElementCreator {
 
 
     //add special type for component of the engine later
 
-    public static ImGuiElement  create(String type, String name, Object value) {
+    public static ImGuiElement create(String type, String name, Object value) {
 //        System.out.println(type + " here");
         switch (type){
             case "int":
